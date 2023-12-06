@@ -5,7 +5,7 @@
  */
 
 #include "search.h"
-#include "search_agents.h"
+#include "agents/search_semantic_neighborhood.h"
 #include "search_keynodes.h"
 
 #include "sc-core/sc_helper.h"
@@ -14,6 +14,7 @@
 sc_memory_context * s_default_ctx = 0;
 
 sc_event * event_question_search_full_semantic_neighborhood;
+sc_event * event_question_search_links_of_relation_connected_with_element;
 
 // --------------------- Module ------------------------
 
@@ -34,6 +35,16 @@ sc_result sc_module_initialize_with_init_memory_generated_structure(sc_addr cons
   if (event_question_search_full_semantic_neighborhood == null_ptr)
     return SC_RESULT_ERROR;
 
+  event_question_search_links_of_relation_connected_with_element = sc_event_new(
+        s_default_ctx,
+        keynode_question_initiated,
+        SC_EVENT_ADD_OUTPUT_ARC,
+        0,
+        agent_search_links_of_relation_connected_with_element,
+        0);
+  if (event_question_search_links_of_relation_connected_with_element == null_ptr)
+    return SC_RESULT_ERROR;
+
   return SC_RESULT_OK;
 }
 
@@ -46,6 +57,8 @@ sc_result sc_module_shutdown()
 {
   if (event_question_search_full_semantic_neighborhood)
     sc_event_destroy(event_question_search_full_semantic_neighborhood);
+  if (event_question_search_links_of_relation_connected_with_element)
+    sc_event_destroy(event_question_search_links_of_relation_connected_with_element);
 
   sc_memory_context_free(s_default_ctx);
 
