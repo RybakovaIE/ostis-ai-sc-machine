@@ -29,6 +29,15 @@ void sc_monitor_destroy(sc_monitor * monitor)
   if (monitor == null_ptr || monitor->id == 0)
     return;
 
+  sc_mutex_lock(&monitor->ref_count_mutex);
+  while (monitor->ref_count > 0)
+  {
+    sc_mutex_unlock(&monitor->ref_count_mutex);
+    g_usleep(10);
+    sc_mutex_lock(&monitor->ref_count_mutex);
+  }
+  sc_mutex_unlock(&monitor->ref_count_mutex);
+
   sc_mutex_destroy(&monitor->rw_mutex);
   monitor->active_readers = 0;
   monitor->active_writer = 0;
