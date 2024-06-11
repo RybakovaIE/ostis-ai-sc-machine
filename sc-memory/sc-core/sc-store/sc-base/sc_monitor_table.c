@@ -29,7 +29,10 @@ void * _sc_monitor_table_clean_periodic(void * arg)
     if (size > 100000)
     {
       if (previous_monitors != null_ptr)
+      {
         sc_hash_table_destroy(previous_monitors);
+        sc_mem_trim();
+      }
 
       sc_mutex_lock(&table->rw_mutex);
       table->global_monitor_id_counter = 1;
@@ -41,7 +44,10 @@ void * _sc_monitor_table_clean_periodic(void * arg)
   }
 
   if (previous_monitors != null_ptr)
+  {
     sc_hash_table_destroy(previous_monitors);
+    sc_mem_trim();
+  }
 
   pthread_exit(null_ptr);
 }
