@@ -490,6 +490,24 @@ private:
     return m_context.HelperCheckEdge(m_structure, addr, ScType::EdgeAccessConstPosPerm);
   }
 
+  inline bool IsCheckCallbackValid()
+  {
+    return m_checkCallback != nullptr;
+  }
+
+  inline bool CheckCallback(ScAddr const & addr)
+  {
+    auto const & cachedIt = m_cachedCheckedConstants.find(addr);
+    if (cachedIt != m_cachedCheckedConstants.cend())
+      return cachedIt->second;
+
+    sc_bool const result = m_checkCallback(addr);
+    if (m_template.m_constants.find(addr) != m_template.m_constants.cend())
+      m_cachedCheckedConstants.insert({addr, result});
+
+    return result;
+  }
+
   ScAddr const & ResolveAddr(
       ScTemplateItem const & templateItem,
       ScAddrVector const & replacementConstruction,
@@ -773,9 +791,9 @@ private:
       if ((IsStructureValid()
            && (!IsInStructure(replacementTriple[0]) || !IsInStructure(replacementTriple[1])
                || !IsInStructure(replacementTriple[2])))
-          || (m_checkCallback
-              && (!m_checkCallback(replacementTriple[0]) || !m_checkCallback(replacementTriple[1])
-                  || !m_checkCallback(replacementTriple[2]))))
+          || (IsCheckCallbackValid()
+              && (!CheckCallback(replacementTriple[0]) || !CheckCallback(replacementTriple[1])
+                  || !CheckCallback(replacementTriple[2]))))
       {
         m_usedEdgesInReplacementConstructions[replacementConstructionIdx].insert(replacementTriple[1]);
         continue;
@@ -1086,6 +1104,7 @@ private:
   ScTemplateTriples m_cycledTemplateTriples;
   std::vector<ScTemplateTriples> m_connectivityComponentsTemplateTriples;
   ScTemplateTriples m_connectivityComponentPriorityTemplateTriples;
+  std::unordered_map<ScAddr, sc_bool, ScAddrHashFunc<sc_uint32>, ScAddrLessFunc> m_cachedCheckedConstants;
 
   // fields search by template
   std::vector<UsedEdges> m_notUsedEdgesInTemplateTriples;

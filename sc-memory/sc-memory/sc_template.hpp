@@ -416,6 +416,7 @@ protected:
   ScTemplateTriplesVector m_templateTriples;
 
   using ScTemplateGroupedTriples = std::unordered_set<size_t>;
+  std::unordered_set<ScAddr, ScAddrHashFunc<sc_uint32>, ScAddrLessFunc> m_constants;
   std::vector<ScTemplateGroupedTriples> m_priorityOrderedTemplateTriples;
   std::map<std::string, ScAddr> m_templateItemsNamesToReplacementItemsAddrs;
   std::map<std::string, ScType> m_templateItemsNamesToTypes;

@@ -144,7 +144,10 @@ ScTemplate & ScTemplate::Triple(
     if (!item.m_name.empty())
     {
       if (item.IsAddr())
+      {
+        m_constants.insert(item.m_addrValue);
         m_templateItemsNamesToReplacementItemsAddrs[item.m_name] = item.m_addrValue;
+      }
       else
       {
         auto const & found = m_templateItemsNamesToReplacementItemsAddrs.find(item.m_name);
